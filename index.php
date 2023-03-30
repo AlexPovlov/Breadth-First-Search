@@ -8,7 +8,8 @@ function search(array $nodes, $startNode, $endNode)
 {
   $graph = new Graph();
   $queue = new Queue();
-  
+
+  $visited = [$startNode => false];
   //Наполняем граф
   foreach ($nodes as $key => $node) {
     $node_obj = new Node($key);
@@ -17,30 +18,31 @@ function search(array $nodes, $startNode, $endNode)
   }
 
   //Устававливаем очередь
-  $queue->setQueue($graph->getNode($startNode)->getConnections());
+  $queue->setQueue([$startNode]);
 
   //Ищем связи
   while ($queue->isNotEmpty()) {
     $node = $graph->getNode($queue->popQueue());
 
-    if (!$node->isVisited()) {
-      if ($node->getId() == $endNode) {
-        echo 'Целевая точка найдена';
-        die();
-      } else {
-        $queue->addQueue($node->getConnections());
-        $node->markVisited();
+    if ($node->getId() == $endNode) {
+      break;
+    } else {
+      if (!in_array($node->getId(), $visited)) {
+        foreach ($node->getConnections() as $key => $next_node) {
+          $next_node = $graph->getNode($next_node);
+          $queue->addQueue($next_node->getId());
+          $visited[$next_node->getId()] = $node->getId();
+        }
       }
-
     }
   }
 
-  echo 'Целевая точка не найдена';
+  return $visited;
 }
 
 $graph = [
   'A' => ['B', 'C', 'D'],
-  'B' => ['G', 'H'],
+  'B' => ['G', 'H', 'D'],
   'C' => ['G'],
   'D' => ['E', 'F'],
   'E' => [],
@@ -49,7 +51,21 @@ $graph = [
   'H' => [],
 ];
 
-$startNode = 'A';
-$endNode = 'C';
+$startNode = 'B';
+$endNode = 'E';
 
-search($graph, $startNode, $endNode);
+$visited = search($graph, $startNode, $endNode);
+$cur_node = $endNode;
+
+echo "Путь от {$startNode} до {$endNode}: <br>";
+
+while ($cur_node) {
+  if (isset($visited[$cur_node])) {
+    echo "{$cur_node} ";
+    $cur_node = $visited[$cur_node];
+  }else {
+    echo "Пути не существует";
+    break;
+  }
+  
+}

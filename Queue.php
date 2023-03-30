@@ -40,17 +40,17 @@ class Queue
 
   /**
    * Добавить элементов в конец очереди
-   * @param array $array
+   * @param mixed $node
    * @return Queue
    */
-  public function addQueue(array $array): self
+  public function addQueue(mixed $node): self
   {
-    $this->queue_array = array_merge($this->queue_array, $array);
+    $this->queue_array[] = $node;
 
     return $this;
   }
 
-  
+
   /**
    * Взять первый элемент и удалить его
    * @return mixed
